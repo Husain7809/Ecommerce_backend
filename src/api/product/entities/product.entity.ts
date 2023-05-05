@@ -19,7 +19,7 @@ export class Product extends EntityCommonFiled {
     @Column({ type: 'varchar', nullable: false })
     description: string;
 
-    @Column({ type: 'json', nullable: true })
+    @Column({ type: 'simple-array', nullable: true })
     image_url: string[]
 
     @Column({ default: 1 })

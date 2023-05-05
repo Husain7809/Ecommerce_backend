@@ -11,7 +11,7 @@ import { UserModule } from '../user/user.module';
 @Module({
   imports: [
     forwardRef(() => UserModule),
-    JwtModule.register({ secret: jwtConstants.secret, signOptions: { expiresIn: '1h' }, }),
+    JwtModule.register({ secret: jwtConstants.secret, signOptions: { expiresIn: '10d' }, }),
     PassportModule
   ],
   controllers: [AuthController],

@@ -19,7 +19,7 @@ export class WatchlistService {
     try {
 
       const { product_id, user_id } = createWatchlist;
-      const product = await this.productServices.getProductQty(product_id);
+      const product = await this.productServices.getProduct(product_id);
       if (!product) {
         throw new NotFoundException("No record found");
       }

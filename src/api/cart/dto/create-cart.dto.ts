@@ -1,9 +1,9 @@
-import { IsNotEmpty, IsNumber, IsString, Max, Min } from "class-validator";
+import { IsInt, IsNotEmpty, IsNumber, IsString, Max, Min } from "class-validator";
 import { Product } from "src/api/product/entities/product.entity";
 import { Double } from "typeorm";
 
 export class CreateCartDto {
-    @IsNumber()
+    @IsInt()
     @IsNotEmpty()
     @Min(1)
     @Max(100)

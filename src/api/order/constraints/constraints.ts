@@ -3,4 +3,6 @@ export const NOT_FOUND_MESSAGE = 'Not found';
 export const UPDATED_MESSAGE = "Successfully updated";
 export const CREATED_MESSAGE = 'Successfully added';
 export const DELETED_MESSAGE = 'Successfully removed';
+export const CANCELE_MESSAGE = 'Successfully canceled';
+
 

@@ -3,7 +3,8 @@ import { WatchlistService } from './watchlist.service';
 import { CreateWatchlistDto } from './dto/create-watchlist.dto';
 import { UpdateWatchlistDto } from './dto/update-watchlist.dto';
 import { AuthGuard } from '@nestjs/passport';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Watchlist')
 @UseGuards(AuthGuard('jwt'))
 @Controller('watchlist')
 export class WatchlistController {

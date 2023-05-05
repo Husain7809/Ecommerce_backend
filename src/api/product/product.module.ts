@@ -6,9 +6,13 @@ import { Product } from './entities/product.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { multerOptions } from 'src/helpers/fileUpload.helper';
 import { CategoryModule } from '../category/category.module';
+import { SubCategoryModule } from '../sub_category/sub_category.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Product]), forwardRef(() => CategoryModule), MulterModule.register(multerOptions)],
+  imports: [TypeOrmModule.forFeature([Product]),
+  forwardRef(() => CategoryModule),
+  forwardRef(() => SubCategoryModule),
+  MulterModule.register(multerOptions)],
   controllers: [ProductController],
   providers: [ProductService],
   exports: [ProductService]

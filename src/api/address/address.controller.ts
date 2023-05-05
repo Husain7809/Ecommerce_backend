@@ -4,7 +4,9 @@ import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { Address } from './entities/address.entity';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Address')
 @UseGuards(AuthGuard('jwt'))
 @Controller('address')
 export class AddressController {

@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException, Req, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { JwtService } from '@nestjs/jwt';
@@ -22,6 +22,11 @@ export class AuthService {
     async createUser(userData: CreateUserDto): Promise<any> {
         try {
             const { first_name, last_name, email, password } = userData;
+
+            const emailFound = await this.usersService.isEmailAlreadyExists(email);
+            if (emailFound !== 0) {
+                throw new BadRequestException("Email id is already exits");
+            }
 
             // password convert hash code
             const salt = await bcrypt.genSalt();
@@ -59,7 +64,6 @@ export class AuthService {
         };
     }
 
-
     async logout(): Promise<object> {
         return {
             message: "logout successFully."
@@ -71,14 +75,14 @@ export class AuthService {
     async sendForgotPasswordLink(email: ForgotPassword, req): Promise<object> {
         const user = await this.usersService.findOne(email.email);
         if (!user) {
-            throw new UnauthorizedException("Invalid Email Address")
+            throw new UnauthorizedException("Invalid your email address")
         }
         const userEmailId = user.email;
 
         const token = jwt.sign({ user: user.id, email: userEmailId }, jwtConstants.secret);
         const expireTime = new Date(Date.now() + 15 * 60 * 1000);
 
-        await this.usersService.setTokenAndDate(email, token, expireTime);  //save on db
+        await this.usersService.setTokenAndDate(email, token, expireTime);  //call the set token and date in db
 
         const resetPasswordLink = `${req.protocol}://${req.get("host")}/auth/password/reset/${token}`;
 
@@ -89,7 +93,6 @@ export class AuthService {
                 msg: "Reset password link not send"
             };
         }
-
         return {
             message: `Reset password link send on your email address.`
         }

@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -18,6 +18,12 @@ export class CategoryService {
 
   async create(createCategory: CreateCategoryDto): Promise<Category> {
     try {
+
+      const isExitsCategory = await this.findOneByCategory(createCategory.name);
+      if (isExitsCategory) {
+        throw new BadRequestException("Category name is alredy exits");
+      }
+
       const result = await this.categoryRepository.save(createCategory);
       return result;
     } catch (e) {
@@ -72,8 +78,10 @@ export class CategoryService {
         fs.unlinkSync(categoryExits.image_url)
       }
       const result = await this.categoryRepository.update(id, updateCategory);
-      return {
-        message: "Category updated successFully"
+      if (result.affected > 0) {
+        return {
+          message: "Category updated successFully"
+        }
       }
     } catch (e) {
       throw new InternalServerErrorException(e.message);
@@ -93,6 +101,8 @@ export class CategoryService {
         message: "category delete successFully"
       }
     } catch (e) {
+      return e;
+      // return e.code == "ER_ROW_IS_REFERENCED_2" ? throw new InternalServerErrorException(e.message) : "";
       throw new InternalServerErrorException(e.message);
     }
   }

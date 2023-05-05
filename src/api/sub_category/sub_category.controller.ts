@@ -11,7 +11,9 @@ import { AuthGuard } from '@nestjs/passport';
 import { Role } from 'src/helpers/role.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/roles.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Sub Category')
 @Controller('sub-category')
 export class SubCategoryController {
   constructor(private readonly subCategoryService: SubCategoryService) { }
@@ -22,8 +24,8 @@ export class SubCategoryController {
   @UseInterceptors(FileInterceptor('subCategory'))
   async createSubCategory(@Body() createSubCategory: CreateSubCategoryDto, @UploadedFile() file: Express.Multer.File): Promise<any> {
 
-    const { name, image_url, category_id } = createSubCategory;
-    return await this.subCategoryService.create({ name, image_url: file.path, category_id });
+    createSubCategory.image_url = file.filename;
+    return await this.subCategoryService.create(createSubCategory);
   }
 
   @Get('/')
@@ -47,8 +49,8 @@ export class SubCategoryController {
   @Put(':id')
   @UseInterceptors(FileInterceptor('subCategory'))
   async updateSubCategory(@Param('id', ParseIntPipe) id: number, @Body() updateCategory: UpdateSubCategoryDto, @UploadedFile() file: Express.Multer.File): Promise<SubCategory | object | any> {
-    const { name, image_url, category_id, is_active } = updateCategory;
-    return await this.subCategoryService.update(id, { name, image_url: file.path, category_id, is_active });
+    updateCategory.image_url = file.filename;
+    return await this.subCategoryService.update(id, updateCategory);
   }
 
 

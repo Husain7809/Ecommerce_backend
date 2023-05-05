@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, Req } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException, Req } from '@nestjs/common';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -23,7 +23,7 @@ export class CartService {
       const { qty, product_id } = createCart;
 
       // get product qty
-      const product = await this.productServices.getProductQty(product_id);
+      const product = await this.productServices.getProduct(product_id);
 
       // check the product is exits or not
       const productExists = await this.cartRepository.createQueryBuilder("cart").where("cart.product_id=:product_id", { product_id }).andWhere("cart.user_id=:u_id", { u_id: user.id }).getOne();
@@ -140,6 +140,10 @@ export class CartService {
 
   // find one by id
   async findOneById(id: number): Promise<Cart | any> {
+    const cart = await this.cartRepository.findOne({ where: { id } });
+    if (!cart) {
+      throw new NotFoundException("Cart not found");
+    }
     return this.cartRepository.createQueryBuilder('cart')
       .innerJoin('cart.product_id', 'product')
       .select(['cart.id', 'cart.qty', 'cart.price', 'cart.user_id', 'product.id'])

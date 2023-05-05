@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
 import { ProductService } from '../product/product.service';
-import { DELETED_MESSAGE, NOT_FOUND_MESSAGE, ORDER_QUANTITY_OVER_MESSAGE, UPDATED_MESSAGE } from './constraints/constraints';
+import { CANCELE_MESSAGE, DELETED_MESSAGE, NOT_FOUND_MESSAGE, ORDER_QUANTITY_OVER_MESSAGE, UPDATED_MESSAGE } from './constraints/constraints';
 import { Product } from '../product/entities/product.entity';
 import { CartService } from '../cart/cart.service';
 import { OrderStatus } from './orderStatus.enum';
@@ -26,6 +26,8 @@ export class OrderService {
     try {
       const { cart_id, user_id } = createOrder;
       const cart = await this.cartServices.findOneById(cart_id);
+      console.log(cart);
+
       if (!cart) {
         throw new NotFoundException("Cart not found");
       }
@@ -40,8 +42,8 @@ export class OrderService {
         qty: cart.qty,
         status: OrderStatus.PENDING,
       })
-      const getQty = await this.productServices.getProductQty(cart.product_id);
-      await this.productServices.updateProductQty(Math.abs(getQty.qty - cart.qty), cart.product_id);
+      const product = await this.productServices.getProduct(cart.product_id);
+      await this.productServices.updateProductQty(product.qty - cart.qty, cart.product_id);
       await this.cartServices.remove(cart_id);
       return { order };
 
@@ -101,5 +103,23 @@ export class OrderService {
       leftJoinAndSelect('order.user', 'user').
       where('order.id=:id', { id }).getOne();
     return order;
+  }
+
+
+  // cancel order by order id
+  async cancelOrder(id: number) {
+    try {
+      const order = await this.orderRepository.update(id, { status: OrderStatus.CANCELED });
+      if (order.affected == 0) {
+        return { msg: NOT_FOUND_MESSAGE }
+      }
+      const orderQty = await this.orderRepository.createQueryBuilder('order').leftJoinAndSelect('order.product', 'product').where('order.id=:id', { id }).getOne(); //get order qty
+      const updatedQty = orderQty.qty + orderQty.product.qty;
+
+      await this.productServices.updateProductQty(updatedQty, orderQty.product.id);  //update product qty
+      return { msg: CANCELE_MESSAGE }
+    } catch (e) {
+      throw new InternalServerErrorException(e.message);
+    }
   }
 }

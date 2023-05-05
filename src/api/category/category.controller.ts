@@ -27,9 +27,9 @@ export class CategoryController {
   @UseInterceptors(FileInterceptor('category'))
   async create(@UploadedFile() file: Express.Multer.File, @Res({ passthrough: true }) res: Response, @Body() createCategory: CreateCategoryDto): Promise<Category | any> {
 
+    createCategory.image_url = file.filename;
     const { name, image_url } = createCategory;
-
-    return this.categoryService.create({ name, image_url: file.path });
+    return this.categoryService.create({ name, image_url });
   }
 
   @Get('/')
@@ -47,8 +47,10 @@ export class CategoryController {
   @Put(':id')
   @UseInterceptors(FileInterceptor('category'))
   async update(@Param('id', ParseIntPipe) id: number, @Body() updateCategory: UpdateCategoryDto, @UploadedFile() file: Express.Multer.File,): Promise<Category> {
+
+    updateCategory.image_url = file.path;
     const { name, image_url, is_active } = updateCategory;
-    return await this.categoryService.update(id, { name, image_url: file.path, is_active });
+    return await this.categoryService.update(id, { name, image_url, is_active });
   }
 
   @Roles(Role.Admin)

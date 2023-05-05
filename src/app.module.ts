@@ -11,20 +11,12 @@ import { WatchlistModule } from './api/watchlist/watchlist.module';
 import { OrderModule } from './api/order/order.module';
 import { PaymentModule } from './api/payment/payment.module';
 import { AddressModule } from './api/address/address.module';
+import { config } from './config/conn';
 
 
 
 @Module({
-  imports: [TypeOrmModule.forRoot({
-    type: 'mysql',
-    host: 'localhost',
-    port: 3306,
-    username: 'root',
-    password: 'Husain123',
-    database: 'ecommerce_system',
-    entities: ['dist/**/*.entity.js'],
-    synchronize: true,
-  }), ConfigModule.forRoot({
+  imports: [TypeOrmModule.forRoot(config), ConfigModule.forRoot({
     envFilePath: '.env',
     isGlobal: true
   }), UserModule, AuthModule, CategoryModule, SubCategoryModule, ProductModule, CartModule, WatchlistModule, OrderModule, PaymentModule, AddressModule]

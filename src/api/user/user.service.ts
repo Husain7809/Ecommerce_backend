@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -13,8 +13,18 @@ export class UserService {
 
     // create user
     async create(userData: CreateUserDto): Promise<User> {
-        const result = await this.userRepository.save(userData);
-        return result;
+        try {
+            const user = new User();
+            user.first_name = userData.first_name;
+            user.last_name = userData.last_name;
+            user.email = userData.email;
+            user.password = userData.password;
+
+            const result = await this.userRepository.save(user);
+            return result;
+        } catch (e) {
+            throw new InternalServerErrorException(e.message);
+        }
     }
 
     // find user by email id
@@ -27,30 +37,45 @@ export class UserService {
         }
     }
 
+    // check email id is exits or not
+    async isEmailAlreadyExists(email: string): Promise<number> {
+        try {
+            const count = await this.userRepository.createQueryBuilder('user').where('user.email=:email', { email }).getCount();
+            return count;
+        } catch (e) {
+            throw new InternalServerErrorException(e.message);
+        }
+    }
+
+
     // reset password token and expire time save
     async setTokenAndDate(email, token: string, expireTime: any) {
-        const user = new User();
-        user.password_recovery_token = token;
-        user.password_expire_time = expireTime;
+        try {
+            const user = new User();
+            user.password_recovery_token = token;
+            user.password_expire_time = expireTime;
 
-        if (token == null && expireTime === null) {
-            await this.userRepository.createQueryBuilder().update(User).set({ password_recovery_token: token, password_expire_time: expireTime }).where({ email }).execute();
-        } else {
+            if (token == null && expireTime === null) {
+                await this.userRepository.createQueryBuilder().update(User).set({ password_recovery_token: token, password_expire_time: expireTime }).where({ email }).execute();
+            }
             await this.userRepository.update(email, user);
+        } catch (e) {
+            throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
         }
     }
 
     // update password user
-    async userPasswordUpdate(email, password): Promise<boolean> {
-        const user = new User();
-        user.password = password;
-        const result = await this.userRepository.createQueryBuilder().update(User).set({ password }).where({ email }).execute();
-        if (!result) {
-            return false;
+    async userPasswordUpdate(email: string, password: string): Promise<boolean> {
+        try {
+            const user = new User();
+            user.password = password;
+            const result = await this.userRepository.createQueryBuilder().update(User).set({ password }).where({ email }).execute();
+            if (!result) {
+                return false;
+            }
+            return true;
+        } catch (e) {
+            throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
         }
-        return true;
     }
-
-
-
 }

@@ -13,4 +13,5 @@ export class EntityCommonFiled {
 
     @UpdateDateColumn()
     updated_at: Date;
+
 }

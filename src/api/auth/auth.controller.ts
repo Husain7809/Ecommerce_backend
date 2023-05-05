@@ -18,9 +18,9 @@ export class AuthController {
 
   @Post('/register')
   async userRegister(@Body() userData: CreateUserDto): Promise<User> {
-    return await this.authService.createUser(userData);
+    const { email, first_name, last_name, password } = userData;
+    return await this.authService.createUser({ email, first_name, last_name, password });
   }
-
 
   @UseGuards(AuthGuard('local'))
   @Post('login')
@@ -35,8 +35,9 @@ export class AuthController {
   //   return req.user;
   // }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get('/logout')
-  logoutUser() {
+  logoutUser(@Req() req) {
     return this.authService.logout();
   }
 

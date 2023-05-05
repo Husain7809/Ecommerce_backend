@@ -40,4 +40,11 @@ export class OrderController {
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.remove(id);
   }
+
+
+  @Post('/cancel')
+  cancelOrder(@Body('order_id') id: number) {
+    return this.orderService.cancelOrder(id);
+  }
+
 }
