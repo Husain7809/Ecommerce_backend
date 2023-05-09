@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrderService } from '../order/order.service';
 import { PaymentStatus } from './paymentStatus.enum';
+import { Role } from 'src/helpers/role.enum';
 
 @Injectable()
 export class PaymentService {
@@ -33,5 +34,20 @@ export class PaymentService {
   }
 
 
-  // get payment record by id
+  // get payment record by usre id
+  async getPaymentList(user) {
+    try {
+      if (user.role === Role.Admin) {
+        const payment = await this.paymentRepository.find();
+        return { payment }
+      }
+      const payment = await this.paymentRepository.createQueryBuilder('payment')
+        .innerJoinAndSelect('payment.order', 'order')
+        .innerJoin('order.user', 'user')
+        .innerJoinAndSelect('order.product', 'product').where('user.id=:id', { id: user.id }).getMany();
+      return { payment }
+    } catch (e) {
+      throw new InternalServerErrorException(e.message);
+    }
+  }
 }

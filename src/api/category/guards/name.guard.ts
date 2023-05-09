@@ -1,5 +1,3 @@
-
-
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 
@@ -12,7 +10,6 @@ export class NameGuard implements CanActivate {
         const formData = request.body;
         // const name = formData['name'];
         // const category = formData['category'];
-
         console.log(formData);
 
 

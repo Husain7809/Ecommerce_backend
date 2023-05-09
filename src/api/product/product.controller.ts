@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Query, Param, Delete, UseInterceptors, Upl
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { CloudConfig } from 'src/helpers/cloudConfig.helper';
 import { Product } from './entities/product.entity';

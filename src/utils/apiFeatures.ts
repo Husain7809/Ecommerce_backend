@@ -15,5 +15,8 @@ export class ApiFeatures {
     }
 
     // filter
+    static filter() {
+        return false;
+    }
 
 }

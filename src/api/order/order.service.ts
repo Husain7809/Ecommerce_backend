@@ -26,7 +26,6 @@ export class OrderService {
     try {
       const { cart_id, user_id } = createOrder;
       const cart = await this.cartServices.findOneById(cart_id);
-      console.log(cart);
 
       if (!cart) {
         throw new NotFoundException("Cart not found");
@@ -46,7 +45,6 @@ export class OrderService {
       await this.productServices.updateProductQty(product.qty - cart.qty, cart.product_id);
       await this.cartServices.remove(cart_id);
       return { order };
-
     } catch (e) {
       throw new InternalServerErrorException(e.message);
     }
