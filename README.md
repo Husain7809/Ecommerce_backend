@@ -43,6 +43,25 @@ $ npm run start:dev
 
 # production mode
 $ npm run start:prod
+
+
+<!-- create .env file and put some code -->
+SECRET_KEY= ""
+
+DB_PASSWORD=''
+
+EMAIL_HOST=""
+EMAIL_PORT=465 
+EMAIL_USER=""
+EMAIL_PASS=""
+
+
+RAZORPAY_API_KEY=""
+RAZORPAY_APT_SECRET=""
+
+
+
+
 ```
 
 ## Test
